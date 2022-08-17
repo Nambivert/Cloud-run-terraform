@@ -1,5 +1,5 @@
 locals {
- terraform_service_account = "YOUR_SERVICE_ACCOUNT@YOUR_PROJECT.iam.gserviceaccount.com"
+ terraform_service_account = "firealarm-test@fiery-chess-357609.iam.gserviceaccount.com"
 }
 
 provider "google" {
@@ -20,7 +20,6 @@ data "google_service_account_access_token" "default" {
 }
 
 provider "google" {
- project 		= YOUR_PROJECT_ID
- access_token	= data.google_service_account_access_token.default.access_token
- request_timeout 	= "60s"
+ access_token	     = data.google_service_account_access_token.default.access_token
+ request_timeout 	 = "60s"
 }
