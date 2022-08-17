@@ -1,27 +1,23 @@
 #Activate service APIs
+module "project-services" {
+  source                      = "terraform-google-modules/project-factory/google//modules/project_services"
+  project_id                  = var.project
+  enable_apis                 = true
+  disable_services_on_destroy = true
 
-resource "google_project_service" "run" {
-  service            = "run.googleapis.com"
-  disable_on_destroy = false
+  activate_apis = [
+    "secretmanager.googleapis.com",
+    "cloudbuild.googleapis.com",
+    "compute.googleapis.com",
+    "run.googleapis.com"
+  ]
 }
 
-resource "google_project_service" "compute" {
-  service            = "compute.googleapis.com"
-  disable_on_destroy = false
-}
-
-resource "google_project_service" "cloudbuild" {
-  service            = "cloudbuild.googleapis.com"
-  disable_on_destroy = false
-}
-
+# Create the secrets
 resource "google_project_service" "secretmanager" {
   service            = "secretmanager.googleapis.com"
   disable_on_destroy = false
 }
-
-# Create the secrets
-
 resource "google_secret_manager_secret" "firealarm-slack-secret" {
   secret_id = "firealarm-slack-secret"
 
@@ -60,7 +56,6 @@ resource "google_cloud_run_service" "service" {
 
   template {
     spec {
-      service_account_name = "firealarm-test@fiery-chess-357609.iam.gserviceaccount.com"
       containers {
         image = var.image
 
