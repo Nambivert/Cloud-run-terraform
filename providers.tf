@@ -3,23 +3,26 @@ locals {
 }
 
 provider "google" {
- alias = "impersonation"
- project     = var.project
- region      = var.region
- scopes = [
-   "https://www.googleapis.com/auth/cloud-platform",
-   "https://www.googleapis.com/auth/userinfo.email",
- ]
+  alias = "tokengen"
+}
+# get config of the client that runs
+data "google_client_config" "default" {
+  provider = google.tokengen
+
+}
+data "google_service_account_access_token" "sa" {
+  provider               = google.tokengen
+  target_service_account = locals.terraform_service_account
+  lifetime               = "600s"
+  scopes = [
+    "https://www.googleapis.com/auth/cloud-platform",
+  ]
 }
 
-data "google_service_account_access_token" "default" {
- provider               	= google.impersonation
- target_service_account 	= local.terraform_service_account
- scopes                 	= ["userinfo-email", "cloud-platform"]
- lifetime               	= "1200s"
-}
-
+/******************************************
+  GA Provider configuration
+ *****************************************/
 provider "google" {
- access_token	     = data.google_service_account_access_token.default.access_token
- request_timeout 	 = "60s"
+  access_token = data.google_service_account_access_token.sa.access_token
+  project      = var.project
 }
